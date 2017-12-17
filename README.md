@@ -26,6 +26,9 @@ pip install pip-tools
 pip-sync
 ```
 
+## Analiza statyczna
+`flake8`
+
 ## Zasady pisania kodu
 1. Każdy merge request (idealnie każdy commit) musi być zgodny z flake8
 2. Każdy merge request powinien zawierać testy jeśli to możliwe/ma sens
