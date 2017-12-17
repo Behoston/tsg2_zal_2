@@ -44,4 +44,4 @@ pip-sync
 TODO
 
 ## Uruchomienie programu
-`./assembly input.fasta output.fasta`
+`python3.6 assembly.py input.fasta output.fasta`
