@@ -26,6 +26,17 @@ pip install pip-tools
 pip-sync
 ```
 
+## Zasady pisania kodu
+1. Każdy merge request (idealnie każdy commit) musi być zgodny z flake8
+2. Każdy merge request powinien zawierać testy jeśli to możliwe/ma sens
+
+
+## Zasady używania gita
+1. Każdy issue na innym branchu
+2. Każdy branch jest domyślnie dla jednej osoby (chyba, że wyraźnie jest prośba o współpracę)
+3. Merge request musi być zawsze sprawdzony przez przynajmniej 1 osobę (inną niż autor lub autorzy)
+4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
+
 ## Tesy
 TODO
 
