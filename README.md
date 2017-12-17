@@ -26,6 +26,12 @@ pip install pip-tools
 pip-sync
 ```
 
+## Zasady używania gita
+1. Każdy issue na innym branchu
+2. Każdy branch jest domyślnie dla jednej osoby (chyba, że wyraźnie jest prośba o współpracę)
+3. Merge request musi być zawsze sprawdzony przez przynajmniej 1 osobę (inną niż autor lub autorzy)
+4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
+
 ## Tesy
 TODO
 
