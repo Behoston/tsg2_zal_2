@@ -4,3 +4,4 @@ __pycache__/
 *$py.class
 .idea/
 sample_data/output.fasta
+*.db

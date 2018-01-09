@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+    {% if done %}
+        <a href="/download/{{ id }}">Download</a>
+    {% elif doing %}
+        Doing...
+    {% else %}
+        Scheduled
+    {% endif %}
+{% endblock %}

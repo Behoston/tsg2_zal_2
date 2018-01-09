@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Genome Assembly</h1>
+    <form action="/schedule" method="post" enctype="multipart/form-data">
+        <label for="fasta_file">Fasta file</label>
+        <input id="fasta_file" name="fasta_file" type="file">
+
+        <label for="algorithm">Algorithm</label>
+        <select id="algorithm" name="algorithm">
+            {% for algorithm in algorithms %}
+                <option value="{{ algorithm }}">{{ algorithm }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
