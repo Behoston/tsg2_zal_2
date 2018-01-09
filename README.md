@@ -43,7 +43,7 @@ pip-sync
 3. Merge request musi być zawsze sprawdzony przez przynajmniej 1 osobę (inną niż autor lub autorzy)
 4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
 
-## Tesy
+## Testy
 TODO
 
 ## Uruchomienie programu
