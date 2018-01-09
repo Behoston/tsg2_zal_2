@@ -1,4 +1,7 @@
 # tsg2_zal_2
+
+[![Build Status](https://travis-ci.org/Behoston/tsg2_zal_2.svg?branch=master)](https://travis-ci.org/Behoston/tsg2_zal_2)
+
 Projekt polega na opracowaniu i zaimplementowaniu algorytmu asemblacji odczytów z sekwencjonowania.
 
 [Opis projektu](https://moodle.mimuw.edu.pl/pluginfile.php?file=%2F24584%2Fmod_resource%2Fcontent%2F0%2Fassignment2.pdf)
@@ -40,7 +43,7 @@ pip-sync
 3. Merge request musi być zawsze sprawdzony przez przynajmniej 1 osobę (inną niż autor lub autorzy)
 4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
 
-## Tesy
+## Testy
 TODO
 
 ## Uruchomienie programu
