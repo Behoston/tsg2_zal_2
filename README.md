@@ -44,7 +44,8 @@ pip-sync
 4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
 
 ## Testy
-TODO
+Wyniki można porównywać do `bowtie2` za pomocą skryptu [evaluate_bowtie.sh](./scripts/evaluate_bowtie.sh)
+
 
 ## Uruchomienie programu
 `python3.6 assembly.py input.fasta output.fasta`

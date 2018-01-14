@@ -3,4 +3,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea/
-sample_data/output.fasta
+sample_data/output*
