@@ -1,0 +1,9 @@
+version: '2.2'
+services:
+  app:
+    image: behoston/tsg2_zal2
+    build: ./app
+    environment:
+      PYTHONPATH: /app
+    cpu_count: 1
+    mem_limit: 512m
