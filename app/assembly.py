@@ -10,7 +10,6 @@ from io_utils import parse_input
 @click.argument('output_file_name', required=False, default='output.fasta')
 @click.option('--algorithm', required=False, type=click.Choice([key for key in algorithms.keys()]), default='SCS')
 def assembly(input_file_name, output_file_name, algorithm):
-    print(input_file_name)
     data = parse_input(input_file_name)
     do_assembly = algorithms[algorithm]
     result = do_assembly(data)
