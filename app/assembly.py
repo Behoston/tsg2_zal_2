@@ -18,8 +18,11 @@ def assembly(input_file_name, output_file_name, algorithm):
 
 @click.command()
 @click.option('--sample', is_flag=True)
+@click.argument('input_file_name', required=False)
+@click.argument('output_file_name', required=False, default='output.fasta')
+@click.option('--algorithm', required=False, type=click.Choice([key for key in algorithms.keys()]), default='SCS')
 @click.pass_context
-def assembly_with_sample_option(ctx, sample: bool):
+def assembly_with_sample_option(ctx, sample: bool, **kwargs):
     if not sample:
         assembly()
     else:
