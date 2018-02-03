@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+cd app
 for FILE in 1 1_to_3 3_to_5
 do
  echo ${FILE}
