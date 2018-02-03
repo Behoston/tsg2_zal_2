@@ -20,6 +20,9 @@ Dla 1000 odczytów o typowych parametrach:
 
 - Projekt używa Pythona w wersji 3.6
 - Do instalacji pakietów używany jest `pip-sync`
+- Wymagany jest `git lfs`
+- Wymagany jest `bowtie2` dostępny bezpośrednio z terminala (dodany do PATH)
+
 
 ```bash
 virtualenv -p /usr/bin/python3.6 ~/venvs/tsg_2_2
