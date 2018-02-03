@@ -16,5 +16,21 @@ def assembly(input_file_name, output_file_name, algorithm):
     dump_output(output_file_name, result)
 
 
+@click.command()
+@click.option('--sample', is_flag=True)
+@click.pass_context
+def assembly_with_sample_option(ctx, sample: bool):
+    if not sample:
+        assembly()
+    else:
+        sample_files = ['1', '1_to_3', '3_to_5']
+        for sample_file in sample_files:
+            ctx.invoke(
+                assembly,
+                input_file_name=f'./sample_data/reads_{sample_file}_percent_bad.fasta',
+                output_file_name=f'./sample_data/output_{sample_file}_percent_bad.fasta',
+            )
+
+
 if __name__ == '__main__':
-    assembly()
+    assembly_with_sample_option()
