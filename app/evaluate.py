@@ -5,9 +5,9 @@ Created on Mon Dec 18 11:58:16 2017
 """
 
 from collections import namedtuple
-from math import log
 
 import pysam
+from math import log
 
 MINLEN = 300
 
@@ -22,7 +22,7 @@ EvaluationResult = namedtuple('EvaluationResult', [
 ])
 
 
-def evaluate(sam_data):
+def evaluate(sam_data):  # noqa C901
     print(sam_data)
     samfile = pysam.AlignmentFile(sam_data)
     reftotlen = sum(samfile.lengths)
@@ -106,6 +106,7 @@ def evaluate(sam_data):
 
 if __name__ == '__main__':
     import sys
+
     result = evaluate(sys.stdin)
     print("Pokrycie referencji:", result.reference_coverage)
     print("Pokrycie odczytów:", result.reads_coverage)
