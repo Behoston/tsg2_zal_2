@@ -1,7 +1,11 @@
 language: python
 python:
   - "3.6"
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y bowtie2
 install:
   - pip install -r app/requirements.txt
 script:
-  - flake8 app
+  - ./scripts/static_analysis.sh
+  - ./scripts/test.sh
