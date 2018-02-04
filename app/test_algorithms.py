@@ -38,7 +38,7 @@ def test_reference():
 
 @pytest.mark.xfail(reason="Algorithms not implementetd yet, enable when ")
 @pytest.mark.parametrize('file', SAMPLE_FILES)
-def test_one_percent_errors(file):
+def test_sample_data(file):
     with tempfile.NamedTemporaryFile(suffix='.fasta') as tmp_file:
         _assembly(
             file,
