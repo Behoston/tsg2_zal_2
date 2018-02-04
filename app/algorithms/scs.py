@@ -34,6 +34,4 @@ def scs(ss):
 
 
 def do_assembly(data):
-    s=scs(data)
-    print(s)
-    return s
+    return scs(data)
