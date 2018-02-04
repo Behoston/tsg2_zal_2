@@ -1,3 +1,7 @@
+from algorithms.error_corrections import CorrectedReads
+from io_utils import parse_input
+
+
 class DeBruijnGraph:
     """ A de Bruijn multigraph built from a collection of strings.
         User supplies strings and k-mer length k.  Nodes of the de
@@ -125,15 +129,18 @@ class Node:
 
 
 # DeBruijnGraph("konstantynopolitanczykowianeczka",5)
-list_graph = DeBruijnGraph(["konstantynopoli", "politanczykowianeczka"], 5)
-print(list_graph.super_string)
+# list_graph = DeBruijnGraph(["konstantynopoli", "politanczykowianeczka"], 5)
+# print(list_graph.super_string)
 # superstring = euler_path[0] + ''.join(map(lambda x: x[-1], euler_path[1:]))
 # print(superstring)
-# data = parse_input('./sample_data/reads_1_percent_bad.fasta')
-# for i in range(1, 81):
-#     try:
-#         graph = DeBruijnGraph(data, i)
-#         print(graph.super_string)
-#         print(i)
-#     except:
-#         pass
+data = parse_input('./sample_data/reads_1_percent_bad.fasta')
+
+for i in range(50, 51):
+    corrected_reads = CorrectedReads(data, k=i)
+    try:
+        print(f"Trying {i}...")
+        graph = DeBruijnGraph(corrected_reads, i)
+        print(graph.super_string)
+        print(f"Success!!!!!!!!!! {i}")
+    except Exception:
+        pass
