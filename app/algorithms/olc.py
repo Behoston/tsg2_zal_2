@@ -1,3 +1,10 @@
+def olc(data: [str]):
+    overlap_graph = overlap_naive()
+    contigs = layout(overlap_graph)
+    sequence = consensus(contigs)
+    return sequence
+
+
 def olc_suffix(data: [str]):
     overlap_graph = overlap_suffix(data)
     contigs = layout(overlap_graph)
@@ -10,6 +17,10 @@ def olc_dynamic(data: [str]):
     contigs = layout(overlap_graph)
     sequence = consensus(contigs)
     return sequence
+
+
+def overlap_naive(data: [str]):
+    pass
 
 
 def overlap_suffix(data: [str]):
