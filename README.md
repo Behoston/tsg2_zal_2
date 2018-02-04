@@ -20,6 +20,9 @@ Dla 1000 odczytów o typowych parametrach:
 
 - Projekt używa Pythona w wersji 3.6
 - Do instalacji pakietów używany jest `pip-sync`
+- Wymagany jest `git lfs`
+- Wymagany jest `bowtie2` dostępny bezpośrednio z terminala (dodany do PATH)
+
 
 ```bash
 virtualenv -p /usr/bin/python3.6 ~/venvs/tsg_2_2
@@ -44,8 +47,16 @@ pip-sync
 4. Merge reuqest musi zawsze odchodzić z mastera (robimy rebase) żeby nie powodować konfliktów
 
 ## Testy
-Wyniki można porównywać do `bowtie2` za pomocą skryptu [evaluate_bowtie.sh](./scripts/evaluate_bowtie.sh)
+Wyniki można porównywać za pomocą skryptu [evaluate_bowtie.sh](./scripts/evaluate_bowtie.sh)
 
+(wymagany jest bowtie2)
+
+
+
+```bash
+
+./scripts/evaluate_bowite.sh output.fasta
+```
 
 ## Uruchomienie programu
 `python3.6 assembly.py input.fasta output.fasta`
