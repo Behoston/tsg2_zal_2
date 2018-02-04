@@ -128,19 +128,25 @@ class Node:
         return self.km1mer
 
 
-# DeBruijnGraph("konstantynopolitanczykowianeczka",5)
-# list_graph = DeBruijnGraph(["konstantynopoli", "politanczykowianeczka"], 5)
-# print(list_graph.super_string)
-# superstring = euler_path[0] + ''.join(map(lambda x: x[-1], euler_path[1:]))
-# print(superstring)
-data = parse_input('./sample_data/reads_1_percent_bad.fasta')
+def do_assembly(data):
+    corrected_reads = CorrectedReads(data, k=10)
+    graph = DeBruijnGraph(corrected_reads, 10)
+    return graph.super_string
 
-for i in range(50, 51):
-    corrected_reads = CorrectedReads(data, k=i)
-    try:
-        print(f"Trying {i}...")
-        graph = DeBruijnGraph(corrected_reads, i)
-        print(graph.super_string)
-        print(f"Success!!!!!!!!!! {i}")
-    except Exception:
-        pass
+
+if __name__ == '__main__':
+    # DEBUG
+
+    list_graph = DeBruijnGraph(["konstantynopoli", "politanczykowianeczka"], 5)
+    print(list_graph.super_string)
+
+    data = parse_input('./sample_data/reads_1_percent_bad.fasta')
+    for i in range(10, 20):
+        corrected_reads = CorrectedReads(data, k=i, threshold=5)
+        try:
+            print(f"Trying {i}...")
+            graph = DeBruijnGraph(corrected_reads, i)
+            print(graph.super_string)
+            print(f"Success!!!!!!!!!! {i}")
+        except Exception:
+            pass
