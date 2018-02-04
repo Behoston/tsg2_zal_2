@@ -31,7 +31,3 @@ def scs(ss):
         if shortest_sup is None or len(sup) < len(shortest_sup):
             shortest_sup = sup  # found shorter superstring
     return shortest_sup  # return shortest
-
-
-def do_assembly(data):
-    return scs(data)
