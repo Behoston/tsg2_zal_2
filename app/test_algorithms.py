@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import pytest
 import sh
 
-from assembly import SAMPLE_FILES, _assembly
+from assembly import SAMPLE_FILES, _assembly, DEFAULT_ALGORITHM
 from evaluate import evaluate
 
 
@@ -36,14 +36,14 @@ def test_reference():
     assert evaluation_results.overall_score == 1
 
 
-@pytest.mark.xfail(reason="Algorithms not implementetd yet, enable when ")
+@pytest.mark.skip(reason="SCS (actual default) algorithm is too slow.")
 @pytest.mark.parametrize('file', SAMPLE_FILES)
 def test_sample_data(file):
     with tempfile.NamedTemporaryFile(suffix='.fasta') as tmp_file:
         _assembly(
             file,
             tmp_file.name,
-            'SCS',
+            DEFAULT_ALGORITHM,
         )
         indexed_result = sh.bowtie2(
             "-a",
