@@ -1,3 +1,6 @@
+import textwrap
+
+
 def parse_input(input_file_name):
     dane = []
     with open(input_file_name) as f:
@@ -10,4 +13,7 @@ def parse_input(input_file_name):
 
 def dump_output(output_file_name, data):
     with open(output_file_name, 'w') as f:
-        f.write(data)
+        f.write('>\n')
+        for line in textwrap.wrap(data, width=80):
+            f.write(line)
+            f.write('\n')

@@ -4,7 +4,7 @@ from algorithms import algorithms
 from io_utils import dump_output
 from io_utils import parse_input
 
-DEFAULT_ALGORITHM = 'SCS'
+DEFAULT_ALGORITHM = 'OLC'
 SAMPLE_FILES = [
     f'./sample_data/reads_{sample_file}_percent_bad.fasta'
     for sample_file in ['1', '1_to_3', '3_to_5']
