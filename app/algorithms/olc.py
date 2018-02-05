@@ -55,7 +55,6 @@ def olc_dynamic(data: [str]):
 
 def overlap_naive(data: [str]):
     minimum_overlap_size = 6
-    number_of_reads = len(data)
     graph = Graph()
     for read in data:
         graph.add_node(Node(read))
