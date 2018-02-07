@@ -76,7 +76,7 @@ def naive_graph_path(graph):
         visited = set()
         super_string = node.value
         visited.add(node)
-        while node.out and len(super_string) < 10000:
+        while node.out:
             next_node, overlap = node.get_next_node_and_overlap()
             if next_node not in visited:
                 node = next_node
@@ -109,4 +109,5 @@ if __name__ == '__main__':
 
     data = parse_input('./sample_data/reads_1_percent_bad.fasta')
     super_string = olc(data)
+    print(len(super_string))
     dump_output('./sample_data/con.fasta', super_string)
