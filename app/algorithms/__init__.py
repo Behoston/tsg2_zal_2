@@ -1,6 +1,6 @@
 from algorithms.olc import olc_suffix, olc_dynamic, olc
 from algorithms.scs import scs as scs
-from algorithms.scs import scs as greedy_scs
+from algorithms.scs import greedy_scs as greedy_scs
 from algorithms.de_bruijn import do_assembly as de_bruijn
 
 
