@@ -1,8 +1,9 @@
+import collections
 import itertools
 
 
 class CorrectedReads:
-    def __init__(self, reads: [str], k=3, threshold=10):
+    def __init__(self, reads: [str], k=10, threshold=2):
         """
         :param reads: list of reads
         :param k: k-mer length
@@ -15,6 +16,7 @@ class CorrectedReads:
         self.histogram = {}
         self.threshold = threshold
         self.alphabet = set()
+        self.corrected_reads = []
 
     def __iter__(self):
         self.build_alphabet()
@@ -25,6 +27,20 @@ class CorrectedReads:
     def __next__(self):
         read = next(self._iterator)
         return self.correct1mm(read)
+
+    def plot_histogram(self):
+        """**Require matplotlib!**"""
+        try:
+            from matplotlib import pyplot
+        except ImportError:
+            print("Please install 'matplotlib' to plot histogram!")
+            return
+        if not self.histogram:
+            self.build_kmer_histogram()
+        counter = collections.Counter(self.histogram.values())
+        x, y = zip(*sorted(counter.items()))
+        pyplot.plot(x, y)
+        pyplot.show()
 
     def build_alphabet(self):
         self.alphabet = set(itertools.chain.from_iterable(self.reads))
