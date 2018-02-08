@@ -18,11 +18,11 @@ SAMPLE_FILES = [
 @click.option('--algorithm', required=False, type=click.Choice([key for key in algorithms.keys()]),
               default=DEFAULT_ALGORITHM)
 @click.option('--error_correction', is_flag=True)
-def assembly(input_file_name, output_file_name, algorithm, error_correction=True):
-    return _assembly(input_file_name, output_file_name, algorithm)
+def assembly(input_file_name, output_file_name, algorithm, error_correction):
+    return _assembly(input_file_name, output_file_name, algorithm, error_correction)
 
 
-def _assembly(input_file_name, output_file_name, algorithm, error_correction=True):
+def _assembly(input_file_name, output_file_name, algorithm, error_correction):
     data = parse_input(input_file_name)
     if error_correction:
         data = CorrectedReads(data)
