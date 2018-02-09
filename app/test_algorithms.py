@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import pytest
 import sh
 
-from assembly import _assembly, DEFAULT_ALGORITHM
+from assembly import assembly, DEFAULT_ALGORITHM
 from assembly_sample import SAMPLE_FILES
 from evaluate import evaluate
 
@@ -40,7 +40,7 @@ def test_reference():
 @pytest.mark.parametrize('file', SAMPLE_FILES)
 def test_sample_data(file):
     with tempfile.NamedTemporaryFile(suffix='.fasta') as tmp_file:
-        _assembly(
+        assembly(
             file,
             tmp_file.name,
             DEFAULT_ALGORITHM,
