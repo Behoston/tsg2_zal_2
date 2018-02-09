@@ -20,7 +20,14 @@ class Graph:
         return len(self.nodes)
 
     def get_random_node_but_not(self, not_nodes: {'Node'}) -> 'Node':
-        return random.choice(list(set(self.nodes.values()) - not_nodes))
+        return random.choice(list(self.node_values_set - not_nodes))
+
+    @cached_property
+    def node_values_set(self):
+        return set(self.nodes.values())
+
+    def get_node_greatest_number_of_reachable_out(self, unreachable: {'Node'}):
+        return max(self.node_values_set - unreachable, key=lambda node: len(node.out_nodes_set - unreachable))
 
 
 class Node:
@@ -46,7 +53,7 @@ class Node:
 
     @cached_property
     def out_nodes_sorted_by_value(self):
-        return [key for key, item in sorted(self.out.items(), key=lambda x: -x[1])]
+        return [key for key, item in sorted(self.out.items(), key=lambda x: x[1], reverse=True)]
 
     def __eq__(self, other):
         return self.value == other.value
@@ -113,16 +120,15 @@ def naive_graph_path_staring_from_node(graph: Graph, start_node: Node) -> [str]:
     graph_len = len(graph)
     while len(visited) != graph_len:
         while node.has_non_visited_out(visited):
-            next_node, overlap = node.get_next_node_and_overlap(visited)
-            node = next_node
+            node, overlap = node.get_next_node_and_overlap(visited)
             super_strings[-1] += node.value[overlap:]
             visited.add(node)
         if len(visited) != graph_len:
-            node = graph.get_random_node_but_not(visited)
+            node = graph.get_node_greatest_number_of_reachable_out(visited)
             super_strings.append(node.value)
             visited.add(node)
     super_strings = [super_string for super_string in super_strings if len(super_string) > minimal_super_string_length]
-    logging.info(f"Generateted {len(super_strings)} contigs!")
+    logging.info(f"Generated {len(super_strings)} contigs!")
     return super_strings
 
 
