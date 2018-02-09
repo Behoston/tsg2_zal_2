@@ -23,7 +23,6 @@ EvaluationResult = namedtuple('EvaluationResult', [
 
 
 def evaluate(sam_data):  # noqa C901
-    print(sam_data)
     samfile = pysam.AlignmentFile(sam_data)
     reftotlen = sum(samfile.lengths)
     rdstotlen = 0
