@@ -1,4 +1,5 @@
 import re
+from typing import Sequence
 
 
 class Graph:
@@ -33,27 +34,27 @@ class Node:
         return hash(self.value)
 
 
-def olc(data: [str]):
+def olc(data: Sequence[str]):
     overlap_graph = overlap_naive(data)
     sequence = naive_graph_path(overlap_graph)
     return max(sequence, key=len)
 
 
-def olc_suffix(data: [str]):
+def olc_suffix(data: Sequence[str]):
     overlap_graph = overlap_suffix(data)
     contigs = layout(overlap_graph)
     sequence = consensus(contigs)
     return sequence
 
 
-def olc_dynamic(data: [str]):
+def olc_dynamic(data: Sequence[str]):
     overlap_graph = overlap_dynamic(data)
     contigs = layout(overlap_graph)
     sequence = consensus(contigs)
     return sequence
 
 
-def overlap_naive(data: [str]):
+def overlap_naive(data: Sequence[str]):
     minimum_overlap_size = 6
     graph = Graph()
     for read in data:
@@ -87,11 +88,11 @@ def naive_graph_path(graph):
         yield super_string
 
 
-def overlap_suffix(data: [str]):
+def overlap_suffix(data: Sequence[str]):
     pass
 
 
-def overlap_dynamic(data: [str]):
+def overlap_dynamic(data: Sequence[str]):
     pass
 
 

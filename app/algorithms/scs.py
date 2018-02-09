@@ -1,4 +1,5 @@
 import itertools
+from typing import Sequence
 
 
 def overlap(a, b, min_length=5):
@@ -17,7 +18,7 @@ def overlap(a, b, min_length=5):
         start += 1  # move just past previous match
 
 
-def scs(ss):
+def scs(ss: Sequence[str]):
     """ Returns shortest common superstring of given
         strings, which must be the same length """
     shortest_sup = None
@@ -47,10 +48,11 @@ def pick_maximal_overlap(reads, k):
     return reada, readb, best_olen
 
 
-def greedy_scs(reads, k=5):
+def greedy_scs(reads: Sequence[str], k=5):
     """ Greedy shortest-common-superstring merge.
         Repeat until no edges (overlaps of length >= k)
         remain. """
+    reads = list(reads)
     read_a, read_b, olen = pick_maximal_overlap(reads, k)
     while olen > 0:
         reads.remove(read_a)

@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from algorithms.error_corrections import CorrectedReads
 from io_utils import parse_input
 
@@ -128,9 +130,8 @@ class Node:
         return self.km1mer
 
 
-def do_assembly(data):
-    corrected_reads = CorrectedReads(data, k=10)
-    graph = DeBruijnGraph(corrected_reads, 10)
+def do_assembly(data: Sequence[str]):
+    graph = DeBruijnGraph(data, 10)
     return graph.super_string
 
 

@@ -25,7 +25,7 @@ def assembly(input_file_name, output_file_name, algorithm, error_correction):
 def _assembly(input_file_name, output_file_name, algorithm, error_correction):
     data = parse_input(input_file_name)
     if error_correction:
-        data = list(CorrectedReads(data))
+        data = CorrectedReads(data)
     do_assembly = algorithms[algorithm]
     result = do_assembly(data)
     dump_output(output_file_name, result)
