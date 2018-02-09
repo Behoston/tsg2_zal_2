@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 cd app
-python assembly.py --sample
+python assembly_sample.py

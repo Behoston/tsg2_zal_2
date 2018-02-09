@@ -5,4 +5,4 @@ COPY requirements.txt .
 RUN pip install pip-tools && pip-sync
 COPY . .
 
-CMD ["python", "assembly.py", "--sample"]
+CMD ["python", "assembly_sample.py"]

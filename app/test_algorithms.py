@@ -4,7 +4,8 @@ from contextlib import contextmanager
 import pytest
 import sh
 
-from assembly import SAMPLE_FILES, _assembly, DEFAULT_ALGORITHM
+from assembly import _assembly, DEFAULT_ALGORITHM
+from assembly_sample import SAMPLE_FILES
 from evaluate import evaluate
 
 
