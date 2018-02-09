@@ -5,3 +5,4 @@ pysam
 sh
 pytest
 cached-property
+pytest-xdist
