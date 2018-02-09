@@ -89,19 +89,19 @@ def naive_graph_path(graph):
 
 
 def overlap_suffix(data: Sequence[str]):
-    pass
+    raise NotImplementedError
 
 
 def overlap_dynamic(data: Sequence[str]):
-    pass
+    raise NotImplementedError
 
 
 def layout(overlap_graph):
-    pass
+    raise NotImplementedError
 
 
 def consensus(contigs):
-    pass
+    raise NotImplementedError
 
 
 if __name__ == '__main__':
