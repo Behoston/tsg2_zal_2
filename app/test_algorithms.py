@@ -43,7 +43,7 @@ def test_sample_data(file):
             file,
             tmp_file.name,
             DEFAULT_ALGORITHM,
-            error_correction=False,
+            error_correction=True,
         )
         indexed_result = sh.bowtie2(
             "-a",
