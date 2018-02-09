@@ -4,3 +4,4 @@ requests
 pysam
 sh
 pytest
+cached-property

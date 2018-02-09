@@ -1,11 +1,14 @@
 import collections
 import itertools
+from typing import Sequence, Iterator
+
+from cached_property import cached_property
 
 
 class CorrectedReads:
-    def __init__(self, reads: [str], k=10, threshold=2):
+    def __init__(self, reads: Sequence[str], k=10, threshold=2):
         """
-        :param reads: list of reads
+        :param reads: sequence of reads
         :param k: k-mer length
         :param threshold: if k-mer occur more often than threshold value,
                k-mer is considered correct. \n
@@ -13,20 +16,30 @@ class CorrectedReads:
         """
         self.reads = reads
         self.k = k
-        self.histogram = {}
         self.threshold = threshold
-        self.alphabet = set()
-        self.corrected_reads = []
 
-    def __iter__(self):
-        self.build_alphabet()
-        self.build_kmer_histogram()
-        self._iterator = iter(self.reads)
-        return self
+    def __iter__(self) -> Iterator[Sequence[str]]:
+        return iter(self.corrected_reads)
 
-    def __next__(self):
-        read = next(self._iterator)
-        return self.correct1mm(read)
+    @cached_property
+    def corrected_reads(self):
+        result = []
+        for read in self.reads:
+            result.append(self.correct1mm(read))
+        return result
+
+    @cached_property
+    def alphabet(self):
+        return set(itertools.chain.from_iterable(self.reads))
+
+    @cached_property
+    def histogram(self):
+        """ Build k-mer histogram and average # k-mer occurrences """
+        histogram = {}
+        for read in self.reads:
+            for kmer in [read[i:i + self.k] for i in range(len(read) - (self.k - 1))]:
+                histogram[kmer] = histogram.get(kmer, 0) + 1
+        return histogram
 
     def plot_histogram(self):
         """**Require matplotlib!**"""
@@ -35,21 +48,10 @@ class CorrectedReads:
         except ImportError:
             print("Please install 'matplotlib' to plot histogram!")
             return
-        if not self.histogram:
-            self.build_kmer_histogram()
         counter = collections.Counter(self.histogram.values())
         x, y = zip(*sorted(counter.items()))
         pyplot.plot(x, y)
         pyplot.show()
-
-    def build_alphabet(self):
-        self.alphabet = set(itertools.chain.from_iterable(self.reads))
-
-    def build_kmer_histogram(self):
-        """ Build k-mer histogram and average # k-mer occurrences """
-        for read in self.reads:
-            for kmer in [read[i:i + self.k] for i in range(len(read) - (self.k - 1))]:
-                self.histogram[kmer] = self.histogram.get(kmer, 0) + 1
 
     def correct1mm(self, read):
         """ Return an error-corrected version of read. """
