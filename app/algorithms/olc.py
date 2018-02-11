@@ -26,18 +26,19 @@ class Graph:
     def __bool__(self):
         return bool(self.nodes)
 
-    def __getitem__(self, item: int or 'Node'):
+    def __getitem__(self, item: int or 'Node') -> 'Node':
         if isinstance(item, int):
             return self.nodes[item]
         else:
             return self.nodes[item.id]
 
-    def remove_node(self, node: 'Node'):
+    def remove_node(self, node: int or 'Node'):
+        node = self[node]
         self.nodes.pop(node.id)
         for out_id in node.out.keys():
-            self.nodes[out_id].entries.pop(node.id)
+            self[out_id].entries.pop(node.id)
         for entry_id in node.entries.keys():
-            self.nodes[entry_id].out.pop(node.id)
+            self[entry_id].out.pop(node.id)
 
     def get_random_node(self) -> 'Node':
         return random.choice(list(self.nodes.values()))
@@ -47,6 +48,20 @@ class Graph:
 
     def get_node_with_smallest_number_of_entries(self):
         return min(self.nodes.values(), key=lambda node: len(node.entries))
+
+    def remove_edges_can_be_inferred_1(self):
+        for node in self.nodes.values():
+            for maybe_inferrable_node_id in reversed(node.out_nodes_sorted_by_value):
+                for following_node_id in node.out_nodes_sorted_by_value:
+                    following_node = self[following_node_id]
+                    if following_node_id in node.out and maybe_inferrable_node_id in following_node.out:
+                        node.out.pop(maybe_inferrable_node_id)
+                        self[maybe_inferrable_node_id].entries.pop(node.id)
+                        break
+
+    @property
+    def average_node_value_length(self):
+        return sum([len(node.value) for node in self]) / len(self)
 
 
 class Node:
@@ -65,23 +80,13 @@ class Node:
     def get_next_node_id_and_overlap(self):
         return max(self.out.items(), key=lambda x: x[1])
 
+    @property
     def has_out(self) -> bool:
         return bool(self.out)
 
     @cached_property
     def out_nodes_sorted_by_value(self):
         return [key for key, item in sorted(self.out.items(), key=lambda x: x[1], reverse=True)]
-
-    def remove_edges_can_be_inferred_1(self):
-        for maybe_inferrable_node in reversed(self.out_nodes_sorted_by_value):
-            for following_node in self.out_nodes_sorted_by_value:
-                if following_node in self.out and maybe_inferrable_node in following_node.out:
-                    self.remove_edge_to_node(maybe_inferrable_node)
-                    break
-
-    def remove_edge_to_node(self, to_node: 'Node'):
-        self.out.pop(to_node)
-        to_node.entries.pop(self)
 
     def __eq__(self, other):
         return self.value == other.value
@@ -153,7 +158,7 @@ def naive_graph_path_staring_from_node(graph: Graph, start_node_id: int) -> [str
     graph.remove_node(node)
     super_strings.append(node.value)
     while len(graph):
-        while node.has_out():
+        while node.has_out:
             node_id, overlap = node.get_next_node_id_and_overlap()
             node = graph[node_id]
             graph.remove_node(node)
@@ -176,26 +181,22 @@ def overlap_dynamic(data: Sequence[str]):
 
 
 def layout(overlap_graph: Graph):
-    nodes_before = []
-    nodes_after = []
-    for node in overlap_graph:
-        nodes_before.append(len(node.out))
-        node.remove_edges_can_be_inferred_1()
-        nodes_after.append(len(node.out))
-    print(sum(nodes_before) / len(nodes_before))
-    print(sum(nodes_after) / len(nodes_after))
+    minimal_super_string_length = len(overlap_graph) * overlap_graph.average_node_value_length * 0.01
+    overlap_graph.remove_edges_can_be_inferred_1()
     node = overlap_graph.get_node_with_smallest_number_of_entries()
     overlap_graph.remove_node(node)
     super_strings = [node.value]
     while overlap_graph:
         while node.has_out:
-            node, overlap = list(node.out.items())[0]
+            node_id, overlap = node.get_next_node_id_and_overlap()
+            node = overlap_graph[node_id]
             overlap_graph.remove_node(node)
             super_strings[-1] += node.value[overlap:]
         if overlap_graph:
             node = overlap_graph.get_node_with_smallest_number_of_entries()
             overlap_graph.remove_node(node)
             super_strings.append(node.value)
+    super_strings = [super_string for super_string in super_strings if len(super_string) > minimal_super_string_length]
     return super_strings
 
 
@@ -211,6 +212,6 @@ if __name__ == '__main__':
 
     data = parse_input('./sample_data/reads_1_percent_bad.fasta')
     with timing():
-        super_string = olc_naive(CorrectedReads(data))
+        super_string = olc(CorrectedReads(data))
     print(len(max(super_string, key=len)))
     dump_output('./sample_data/con.fasta', super_string)
