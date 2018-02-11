@@ -1,9 +1,13 @@
 import logging
+import pickle
 import random
 import re
+from itertools import count
 from typing import Sequence
 
 from cached_property import cached_property
+
+from utils import timing
 
 
 class Graph:
@@ -11,7 +15,7 @@ class Graph:
         self.nodes = {}
 
     def add_node(self, node):
-        self.nodes[node.value] = node
+        self.nodes[node.id] = node
 
     def __iter__(self):
         return iter(self.nodes.values())
@@ -19,50 +23,50 @@ class Graph:
     def __len__(self):
         return len(self.nodes)
 
-    def get_random_node_but_not(self, not_nodes: {'Node'}) -> 'Node':
-        return random.choice(list(self.node_values_set - not_nodes))
+    def __bool__(self):
+        return bool(self.nodes)
 
-    @cached_property
-    def node_values_set(self):
-        return set(self.nodes.values())
+    def __getitem__(self, item: int or 'Node'):
+        if isinstance(item, int):
+            return self.nodes[item]
+        else:
+            return self.nodes[item.id]
 
-    def get_node_greatest_number_of_reachable_out(self, unreachable: {'Node'} = None):
-        if unreachable is None:
-            unreachable = set()
-        return max(self.node_values_set - unreachable, key=lambda node: len(node.out_nodes_set - unreachable))
+    def remove_node(self, node: 'Node'):
+        self.nodes.pop(node.id)
+        for out_id in node.out.keys():
+            self.nodes[out_id].entries.pop(node.id)
+        for entry_id in node.entries.keys():
+            self.nodes[entry_id].out.pop(node.id)
 
-    def get_node_with_smallest_number_of_reachable_entries(self, unreachable: {'Node'} = None):
-        if unreachable is None:
-            unreachable = set()
-        return min(self.node_values_set - unreachable, key=lambda node: len(node.entries_node_set - unreachable))
+    def get_random_node(self) -> 'Node':
+        return random.choice(list(self.nodes.values()))
+
+    def get_node_greatest_number_of_out(self):
+        return max(self.nodes.values(), key=lambda node: len(node.out))
+
+    def get_node_with_smallest_number_of_entries(self):
+        return min(self.nodes.values(), key=lambda node: len(node.entries))
 
 
 class Node:
+    _id = count()
+
     def __init__(self, value):
+        self.id = next(self._id)
         self.value = value
         self.out = {}
         self.entries = {}
 
     def add_edge_with_value(self, node, value):
-        self.out[node] = value
-        node.entries[self] = value
+        self.out[node.id] = value
+        node.entries[self.id] = value
 
-    def get_next_node_and_overlap(self, visited: {'Node'}):
-        for node in self.out_nodes_sorted_by_value:
-            if node not in visited:
-                return node, self.out[node]
-        raise Exception("Integrity exception!")
+    def get_next_node_id_and_overlap(self):
+        return max(self.out.items(), key=lambda x: x[1])
 
-    def has_non_visited_out(self, visited: {'Node'}) -> bool:
-        return bool(self.out_nodes_set - visited)
-
-    @cached_property
-    def out_nodes_set(self) -> set('Node'):
-        return set(self.out.keys())
-
-    @cached_property
-    def entries_node_set(self):
-        return set(self.entries.keys())
+    def has_out(self) -> bool:
+        return bool(self.out)
 
     @cached_property
     def out_nodes_sorted_by_value(self):
@@ -133,30 +137,31 @@ def overlap_naive(data: Sequence[str]):
 
 
 def naive_graph_path(graph):
+    pickled_graph = pickle.dumps(graph)
     for node in graph:
-        super_strings = naive_graph_path_staring_from_node(graph, node)
+        super_strings = naive_graph_path_staring_from_node(pickle.loads(pickled_graph), node)
         if super_strings:
             yield super_strings
 
 
-def naive_graph_path_staring_from_node(graph: Graph, start_node: Node) -> [str]:
-    read_length = len(start_node.value)
+def naive_graph_path_staring_from_node(graph: Graph, start_node_id: int) -> [str]:
+    node = graph[start_node_id]
+    read_length = len(node.value)
     minimal_super_string_length = len(graph) * read_length * 0.01
     super_strings = []
-    visited = set()
-    node = start_node
+
+    graph.remove_node(node)
     super_strings.append(node.value)
-    visited.add(node)
-    graph_len = len(graph)
-    while len(visited) != graph_len:
-        while node.has_non_visited_out(visited):
-            node, overlap = node.get_next_node_and_overlap(visited)
+    while len(graph):
+        while node.has_out():
+            node_id, overlap = node.get_next_node_id_and_overlap()
+            node = graph[node_id]
+            graph.remove_node(node)
             super_strings[-1] += node.value[overlap:]
-            visited.add(node)
-        if len(visited) != graph_len:
-            node = graph.get_node_greatest_number_of_reachable_out(visited)
+        if len(graph):
+            node = graph.get_node_greatest_number_of_out()
             super_strings.append(node.value)
-            visited.add(node)
+            graph.remove_node(node)
     super_strings = [super_string for super_string in super_strings if len(super_string) > minimal_super_string_length]
     logging.info(f"Generated {len(super_strings)} contigs!")
     return super_strings
@@ -179,17 +184,17 @@ def layout(overlap_graph: Graph):
         nodes_after.append(len(node.out))
     print(sum(nodes_before) / len(nodes_before))
     print(sum(nodes_after) / len(nodes_after))
-    node = overlap_graph.get_node_with_smallest_number_of_reachable_entries()
+    node = overlap_graph.get_node_with_smallest_number_of_entries()
+    overlap_graph.remove_node(node)
     super_strings = [node.value]
-    visited = {node}
-    while len(visited) != len(overlap_graph):
-        while len(node.out) == 1:
+    while overlap_graph:
+        while node.has_out:
             node, overlap = list(node.out.items())[0]
-            visited.add(node)
+            overlap_graph.remove_node(node)
             super_strings[-1] += node.value[overlap:]
-        if len(visited) != len(overlap_graph):
-            node = overlap_graph.get_node_with_smallest_number_of_reachable_entries(visited)
-            visited.add(node)
+        if overlap_graph:
+            node = overlap_graph.get_node_with_smallest_number_of_entries()
+            overlap_graph.remove_node(node)
             super_strings.append(node.value)
     return super_strings
 
@@ -205,6 +210,7 @@ if __name__ == '__main__':
     from algorithms.error_corrections import CorrectedReads
 
     data = parse_input('./sample_data/reads_1_percent_bad.fasta')
-    super_string = olc(CorrectedReads(data))
+    with timing():
+        super_string = olc_naive(CorrectedReads(data))
     print(len(max(super_string, key=len)))
     dump_output('./sample_data/con.fasta', super_string)
