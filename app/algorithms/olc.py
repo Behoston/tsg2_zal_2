@@ -26,17 +26,26 @@ class Graph:
     def node_values_set(self):
         return set(self.nodes.values())
 
-    def get_node_greatest_number_of_reachable_out(self, unreachable: {'Node'}):
+    def get_node_greatest_number_of_reachable_out(self, unreachable: {'Node'} = None):
+        if unreachable is None:
+            unreachable = set()
         return max(self.node_values_set - unreachable, key=lambda node: len(node.out_nodes_set - unreachable))
+
+    def get_node_with_smallest_number_of_reachable_entries(self, unreachable: {'Node'} = None):
+        if unreachable is None:
+            unreachable = set()
+        return min(self.node_values_set - unreachable, key=lambda node: len(node.entries_node_set - unreachable))
 
 
 class Node:
     def __init__(self, value):
         self.value = value
         self.out = {}
+        self.entries = {}
 
     def add_edge_with_value(self, node, value):
         self.out[node] = value
+        node.entries[self] = value
 
     def get_next_node_and_overlap(self, visited: {'Node'}):
         for node in self.out_nodes_sorted_by_value:
@@ -52,8 +61,23 @@ class Node:
         return set(self.out.keys())
 
     @cached_property
+    def entries_node_set(self):
+        return set(self.entries.keys())
+
+    @cached_property
     def out_nodes_sorted_by_value(self):
         return [key for key, item in sorted(self.out.items(), key=lambda x: x[1], reverse=True)]
+
+    def remove_edges_can_be_inferred_1(self):
+        for maybe_inferrable_node in reversed(self.out_nodes_sorted_by_value):
+            for following_node in self.out_nodes_sorted_by_value:
+                if following_node in self.out and maybe_inferrable_node in following_node.out:
+                    self.remove_edge_to_node(maybe_inferrable_node)
+                    break
+
+    def remove_edge_to_node(self, to_node: 'Node'):
+        self.out.pop(to_node)
+        to_node.entries.pop(self)
 
     def __eq__(self, other):
         return self.value == other.value
@@ -62,10 +86,16 @@ class Node:
         return hash(self.value)
 
 
-def olc(data: Sequence[str]):
+def olc_naive(data: Sequence[str]):
     overlap_graph = overlap_naive(data)
     sequence = naive_graph_path(overlap_graph)
     return max(sequence, key=lambda x: len(max(x, key=len)))
+
+
+def olc(data: Sequence[str]):
+    overlap_graph = overlap_naive(data)
+    sequences = layout(overlap_graph)
+    return sequences
 
 
 def olc_suffix(data: Sequence[str]):
@@ -140,8 +170,28 @@ def overlap_dynamic(data: Sequence[str]):
     raise NotImplementedError
 
 
-def layout(overlap_graph):
-    raise NotImplementedError
+def layout(overlap_graph: Graph):
+    nodes_before = []
+    nodes_after = []
+    for node in overlap_graph:
+        nodes_before.append(len(node.out))
+        node.remove_edges_can_be_inferred_1()
+        nodes_after.append(len(node.out))
+    print(sum(nodes_before) / len(nodes_before))
+    print(sum(nodes_after) / len(nodes_after))
+    node = overlap_graph.get_node_with_smallest_number_of_reachable_entries()
+    super_strings = [node.value]
+    visited = {node}
+    while len(visited) != len(overlap_graph):
+        while len(node.out) == 1:
+            node, overlap = list(node.out.items())[0]
+            visited.add(node)
+            super_strings[-1] += node.value[overlap:]
+        if len(visited) != len(overlap_graph):
+            node = overlap_graph.get_node_with_smallest_number_of_reachable_entries(visited)
+            visited.add(node)
+            super_strings.append(node.value)
+    return super_strings
 
 
 def consensus(contigs):
