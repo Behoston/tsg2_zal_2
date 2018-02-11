@@ -1,13 +1,15 @@
 import logging
+import math
 import pickle
 import random
 import re
+from functools import lru_cache
 from itertools import count
 from typing import Sequence
 
 from cached_property import cached_property
 
-from utils import timing
+from utils import timing, print_progress
 
 
 class Graph:
@@ -43,10 +45,10 @@ class Graph:
     def get_random_node(self) -> 'Node':
         return random.choice(list(self.nodes.values()))
 
-    def get_node_greatest_number_of_out(self):
+    def get_node_greatest_number_of_out(self) -> 'Node':
         return max(self.nodes.values(), key=lambda node: len(node.out))
 
-    def get_node_with_smallest_number_of_entries(self):
+    def get_node_with_smallest_number_of_entries(self) -> 'Node':
         return min(self.nodes.values(), key=lambda node: len(node.entries))
 
     def remove_edges_can_be_inferred_1(self):
@@ -67,15 +69,15 @@ class Graph:
 class Node:
     _id = count()
 
-    def __init__(self, value):
+    def __init__(self, value: str):
         self.id = next(self._id)
         self.value = value
         self.out = {}
         self.entries = {}
 
-    def add_edge_with_value(self, node, value):
-        self.out[node.id] = value
-        node.entries[self.id] = value
+    def add_edge_with_weight(self, node: 'Node', weight: int):
+        self.out[node.id] = weight
+        node.entries[self.id] = weight
 
     def get_next_node_id_and_overlap(self):
         return max(self.out.items(), key=lambda x: x[1])
@@ -88,7 +90,7 @@ class Node:
     def out_nodes_sorted_by_value(self):
         return [key for key, item in sorted(self.out.items(), key=lambda x: x[1], reverse=True)]
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Node'):
         return self.value == other.value
 
     def __hash__(self):
@@ -127,7 +129,9 @@ def overlap_naive(data: Sequence[str]):
     graph = Graph()
     for read in data:
         graph.add_node(Node(read))
-    for read_a in graph:
+    total_iterations = len(graph)
+    for iteration_number, read_a in enumerate(graph):
+        print_progress(iteration_number, total_iterations, 'Building graph:')
         sufix = read_a.value[-minimum_overlap_size:]
         sufix_pattern = re.compile(f'.*{sufix}')
         for read_b in graph:
@@ -135,7 +139,7 @@ def overlap_naive(data: Sequence[str]):
                 continue
             for prefix in re.findall(sufix_pattern, read_b.value):
                 if read_a.value.endswith(prefix):
-                    read_a.add_edge_with_value(read_b, len(prefix))
+                    read_a.add_edge_with_weight(read_b, len(prefix))
                     break
     logging.info("Graph has been built!")
     return graph
@@ -177,7 +181,66 @@ def overlap_suffix(data: Sequence[str]):
 
 
 def overlap_dynamic(data: Sequence[str]):
-    raise NotImplementedError
+    logging.info("Building graph.")
+    minimum_overlap_size = 6
+    graph = Graph()
+    for read in data:
+        graph.add_node(Node(read))
+    total_iterations = len(graph)
+    for iteration, node_x in enumerate(graph):
+        print_progress(iteration, total_iterations, prefix='Building graph:')
+        for node_y in graph:
+            if node_x == node_y:
+                continue
+            overlap = _check_overlap_dynamic(node_x, node_y, minimum_overlap_size)
+            if overlap:
+                node_x.add_edge_with_weight(node_y, overlap)
+    logging.info("Graph has been built!")
+    return graph
+
+
+def _check_overlap_dynamic(node_x, node_y, minimal_overlap: int) -> int or None:
+    x = len(node_x.value)
+    y = len(node_y.value)
+    assert x == y
+    cost_full = 4
+    cost_same_group = cost_full / 2
+    cost_gap = cost_full * 2
+    allowed_mismatches_percent = 0.1
+
+    @lru_cache(maxsize=None)
+    def s(a: str, b: str) -> int:
+        if a == b:
+            return 0
+        else:
+            ab = {a, b}
+            if {'A', 'G'} == ab or {'T', 'C'} == ab:
+                return cost_same_group
+            else:
+                return cost_full
+
+    table = []
+    for row in range(x + 1):
+        table.append([])
+        for col in range(y + 1):
+            if col == 0:
+                val = 0
+            elif row == 0:
+                val = math.inf
+            else:
+                val = None
+            table[-1].append(val)
+    for i, char_x in zip(range(1, x + 1), node_x.value):
+        for j, char_y in zip(range(1, y + 1), node_y.value):
+            table[i][j] = min(
+                table[i - 1][j] + cost_gap,
+                table[i][j - 1] + cost_gap,
+                table[i - 1][j - 1] + s(char_x, char_y),
+            )
+    score = min(table[-1][minimal_overlap:])
+    overlap = table[-1][minimal_overlap:].index(score) + minimal_overlap
+    if overlap * allowed_mismatches_percent * cost_full >= score:
+        return overlap
 
 
 def layout(overlap_graph: Graph):
