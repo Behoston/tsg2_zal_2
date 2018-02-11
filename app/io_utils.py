@@ -20,7 +20,7 @@ def dump_output(output_file_name, data: str or []):
                 f.write('\n')
         else:
             for contig_number, contig in enumerate(data):
-                f.write(f'> contig {contig_number}\n')
+                f.write(f'>contig_{contig_number}\n')
                 for line in textwrap.wrap(contig, width=80):
                     f.write(line)
                     f.write('\n')

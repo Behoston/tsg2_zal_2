@@ -52,9 +52,13 @@ class Graph:
         return min(self.nodes.values(), key=lambda node: len(node.entries))
 
     def remove_edges_can_be_inferred_1(self):
-        for node in self.nodes.values():
+        total_iterations = len(self)
+        for iteration_number, node in enumerate(self.nodes.values()):
+            print_progress(iteration_number, total_iterations, 'Removing edges that can be inferred:')
             for maybe_inferrable_node_id in reversed(node.out_nodes_sorted_by_value):
                 for following_node_id in node.out_nodes_sorted_by_value:
+                    if following_node_id == maybe_inferrable_node_id:
+                        continue
                     following_node = self[following_node_id]
                     if following_node_id in node.out and maybe_inferrable_node_id in following_node.out:
                         node.out.pop(maybe_inferrable_node_id)
@@ -118,13 +122,10 @@ def olc_suffix(data: Sequence[str]):
 
 def olc_dynamic(data: Sequence[str]):
     overlap_graph = overlap_dynamic(data)
-    contigs = layout(overlap_graph)
-    sequence = consensus(contigs)
-    return sequence
+    return layout(overlap_graph)
 
 
 def overlap_naive(data: Sequence[str]):
-    logging.info("Building graph.")
     minimum_overlap_size = 6
     graph = Graph()
     for read in data:
@@ -141,7 +142,6 @@ def overlap_naive(data: Sequence[str]):
                 if read_a.value.endswith(prefix):
                     read_a.add_edge_with_weight(read_b, len(prefix))
                     break
-    logging.info("Graph has been built!")
     return graph
 
 
