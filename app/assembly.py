@@ -5,7 +5,7 @@ from algorithms.error_corrections import CorrectedReads
 from io_utils import dump_output
 from io_utils import parse_input
 
-DEFAULT_ALGORITHM = 'OLC_NAIVE'
+DEFAULT_ALGORITHM = 'OLC'
 
 
 @click.command()
